@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI工具</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 700px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        #chat {
+            border: 1px solid #ddd;
+            height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .msg {
+            margin: 8px 0;
+        }
+
+        .user {
+            text-align: right;
+            color: blue;
+        }
+
+        .ai {
+            text-align: left;
+            color: green;
+        }
+
+        input {
+            width: 80%;
+            padding: 8px;
+        }
+
+        button {
+            padding: 8px 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>AI聊天工具</h2>
+
+<div id="chat"></div>
+
+<input type="text" id="userInput" placeholder="请输入...">
+<button onclick="send()">发送</button>
+
+<script>
+function addMsg(text, type) {
+    let div = document.createElement("div");
+    div.className = "msg " + type;
+    div.innerText = text;
+    document.getElementById("chat").appendChild(div);
+
+    let chat = document.getElementById("chat");
+    chat.scrollTop = chat.scrollHeight;
+}
+
+function send() {
+    let input = document.getElementById("userInput").value;
+
+    if (!input) return;
+
+    addMsg("你：" + input, "user");
+
+    fetch("/ask", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            message: input
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        addMsg("AI：" + data.reply, "ai");
+    });
+
+    document.getElementById("userInput").value = "";
+}
+</script>
+
+</body>
+</html>
